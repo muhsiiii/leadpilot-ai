@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('leads', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('business_id')->constrained()->cascadeOnDelete();
+            $table->string('name')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->text('requirement')->nullable();
+            $table->string('preferred_date')->nullable();
+            $table->string('status')->default('new');
+            $table->string('source')->default('website_chat');
             $table->timestamps();
         });
     }

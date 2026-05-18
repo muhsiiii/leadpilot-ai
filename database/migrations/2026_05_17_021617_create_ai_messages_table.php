@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('ai_messages', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('business_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('lead_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('role');
+            $table->longText('message');
+            $table->string('model')->nullable();
             $table->timestamps();
         });
     }

@@ -6,5 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lead extends Model
 {
-    //
+    protected $fillable = [
+        'business_id',
+        'name',
+        'phone',
+        'email',
+        'requirement',
+        'preferred_date',
+        'status',
+        'source',
+    ];
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
 }
