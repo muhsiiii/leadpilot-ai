@@ -77,6 +77,16 @@
         const chatForm = document.getElementById('chatForm');
         const messageInput = document.getElementById('messageInput');
         const chatBox = document.getElementById('chatBox');
+        const visitorTokenKey = 'leadpilot_visitor_{{ $business->slug }}';
+        let visitorToken = localStorage.getItem(visitorTokenKey);
+
+        if (!visitorToken) {
+            visitorToken = window.crypto && window.crypto.randomUUID
+                ? window.crypto.randomUUID()
+                : String(Date.now()) + '-' + Math.random().toString(36).slice(2);
+
+            localStorage.setItem(visitorTokenKey, visitorToken);
+        }
 
         function addMessage(text, type) {
             const div = document.createElement('div');
@@ -111,11 +121,15 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     },
-                    body: JSON.stringify({ message }),
+                    body: JSON.stringify({ message, visitor_token: visitorToken }),
                 });
 
                 const data = await response.json();
                 addMessage(data.reply || 'Sorry, I could not reply right now.', 'assistant');
+
+                if (data.lead_captured) {
+                    addMessage('Your contact details were saved. The team can follow up from here.', 'assistant');
+                }
             } catch (error) {
                 addMessage('Sorry, something went wrong. Please try again.', 'assistant');
             } finally {

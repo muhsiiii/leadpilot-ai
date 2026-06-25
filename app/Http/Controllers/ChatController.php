@@ -39,10 +39,16 @@ class ChatController extends Controller
     {
         $request->validate([
             'message' => ['required', 'string', 'max:1000'],
+            'visitor_token' => ['nullable', 'string', 'max:80'],
         ]);
+
+        $visitorToken = $request->filled('visitor_token')
+            ? Str::of($request->string('visitor_token'))->replaceMatches('/[^a-zA-Z0-9_-]/', '')->limit(80, '')->toString()
+            : null;
 
         AiMessage::create([
             'business_id' => $business->id,
+            'visitor_token' => $visitorToken,
             'role' => 'user',
             'message' => $request->message,
             'model' => config('services.openrouter.model'),
@@ -61,12 +67,13 @@ class ChatController extends Controller
 
         AiMessage::create([
             'business_id' => $business->id,
+            'visitor_token' => $visitorToken,
             'role' => 'assistant',
             'message' => $reply,
             'model' => config('services.openrouter.model'),
         ]);
 
-        $lead = $this->tryCreateLead($business, $request->message);
+        $lead = $this->tryCreateLead($business, $request->message, $visitorToken);
 
         return response()->json([
             'reply' => $reply,
@@ -108,9 +115,10 @@ class ChatController extends Controller
         ";
     }
 
-    private function tryCreateLead(Business $business, string $message): ?Lead
+    private function tryCreateLead(Business $business, string $message, ?string $visitorToken): ?Lead
     {
-        $phone = $this->extractPhoneFromMessage($message);
+        $leadContext = $this->buildLeadContext($business, $message, $visitorToken);
+        $phone = $this->extractPhoneFromMessage($leadContext);
 
         if (! $phone) {
             return null;
@@ -122,21 +130,73 @@ class ChatController extends Controller
                 'phone' => $phone,
             ],
             [
-                'name' => $this->extractNameFromMessage($message),
-                'email' => $this->extractEmailFromMessage($message),
-                'requirement' => $this->cleanRequirement($message),
-                'preferred_date' => $this->extractPreferredDate($message),
+                'visitor_token' => $visitorToken,
+                'name' => $this->extractNameFromMessage($leadContext),
+                'email' => $this->extractEmailFromMessage($leadContext),
+                'requirement' => $this->cleanRequirement($leadContext),
+                'preferred_date' => $this->extractPreferredDate($leadContext),
                 'status' => 'new',
                 'source' => 'website_chat',
             ]
         );
     }
 
+    private function buildLeadContext(Business $business, string $message, ?string $visitorToken): string
+    {
+        if (! $visitorToken) {
+            return $message;
+        }
+
+        $messages = AiMessage::query()
+            ->where('business_id', $business->id)
+            ->where('visitor_token', $visitorToken)
+            ->where('role', 'user')
+            ->latest()
+            ->take(8)
+            ->pluck('message')
+            ->reverse();
+
+        return $messages->isNotEmpty() ? $messages->implode("\n") : $message;
+    }
+
     private function extractPhoneFromMessage(string $message): ?string
     {
-        preg_match('/(?:\+91[\s-]?)?([6-9]\d{9})\b/', $message, $phoneMatch);
+        $candidate = '(?:\+?\d[\d\s().-]{5,}\d)';
+        $withCue = '/\b(?:phone|mobile|number|contact|call|whatsapp|wa)\b\s*(?:number)?\s*(?:is|:|-)?\s*('.$candidate.')/i';
 
-        return $phoneMatch[1] ?? null;
+        if (preg_match_all($withCue, $message, $matches)) {
+            foreach ($matches[1] as $match) {
+                $phone = $this->normalizePhone($match, minDigits: 7);
+
+                if ($phone) {
+                    return $phone;
+                }
+            }
+        }
+
+        if (preg_match_all('/(?<!\d)'.$candidate.'(?!\d)/', $message, $matches)) {
+            foreach ($matches[0] as $match) {
+                $phone = $this->normalizePhone($match, minDigits: 10);
+
+                if ($phone) {
+                    return $phone;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizePhone(string $phone, int $minDigits): ?string
+    {
+        $hasPlus = str_starts_with(trim($phone), '+');
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        if (! $digits || strlen($digits) < $minDigits || strlen($digits) > 15) {
+            return null;
+        }
+
+        return $hasPlus ? '+'.$digits : $digits;
     }
 
     private function extractNameFromMessage(string $message): ?string
@@ -150,7 +210,11 @@ class ChatController extends Controller
 
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $message, $match)) {
-                return Str::of($match[1])->squish()->title()->toString();
+                return Str::of($match[1])
+                    ->replaceMatches('/\b(?:and|my|phone|mobile|number|email|for|i need|contact|call|whatsapp)\b.*$/i', '')
+                    ->squish()
+                    ->title()
+                    ->toString();
             }
         }
 
@@ -186,7 +250,8 @@ class ChatController extends Controller
     private function cleanRequirement(string $message): string
     {
         return Str::of($message)
-            ->replaceMatches('/(?:\+91[\s-]?)?[6-9]\d{9}\b/', '')
+            ->replaceMatches('/\b(?:phone|mobile|number|contact|call|whatsapp|wa)\b\s*(?:number)?\s*(?:is|:|-)?\s*(?:\+?\d[\d\s().-]{5,}\d)/i', '')
+            ->replaceMatches('/(?<!\d)(?:\+?\d[\d\s().-]{8,}\d)(?!\d)/', '')
             ->replaceMatches('/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i', '')
             ->squish()
             ->limit(500, '')

@@ -70,4 +70,46 @@ class ChatLeadCaptureTest extends TestCase
 
         $this->assertSame(1, Lead::count());
     }
+
+    public function test_chat_captures_lead_details_across_visitor_messages(): void
+    {
+        Http::fake([
+            'openrouter.ai/*' => Http::response([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => 'Thanks. The team will contact you shortly.',
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $business = Business::create([
+            'name' => 'Bright Dental',
+            'slug' => 'bright-dental',
+            'type' => 'Clinic',
+            'description' => 'A clinic for dental services.',
+        ]);
+
+        $visitorToken = 'visitor-test-123';
+
+        $this->postJson(route('business.chat.send', $business), [
+            'message' => 'My name is Kiran and I want cleaning',
+            'visitor_token' => $visitorToken,
+        ])->assertOk()->assertJson(['lead_captured' => false]);
+
+        $this->postJson(route('business.chat.send', $business), [
+            'message' => 'my number is 124565632',
+            'visitor_token' => $visitorToken,
+        ])->assertOk()->assertJson(['lead_captured' => true]);
+
+        $this->assertDatabaseHas('leads', [
+            'business_id' => $business->id,
+            'visitor_token' => $visitorToken,
+            'name' => 'Kiran',
+            'phone' => '124565632',
+            'status' => 'new',
+        ]);
+    }
 }

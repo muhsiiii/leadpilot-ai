@@ -9,6 +9,7 @@ class AiMessage extends Model
     protected $fillable = [
         'business_id',
         'lead_id',
+        'visitor_token',
         'role',
         'message',
         'model',

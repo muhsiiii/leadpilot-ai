@@ -17,8 +17,8 @@
 
             <section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                 <h3 class="font-semibold text-gray-950">Website widget</h3>
-                <p class="mt-2 text-sm text-gray-600">Paste this before the closing body tag on the client website.</p>
-                <pre class="mt-4 overflow-x-auto rounded-md bg-gray-950 p-4 text-sm text-white"><code>&lt;script src="{{ route('widget.script') }}" data-business="{{ $business->slug }}"&gt;&lt;/script&gt;</code></pre>
+                <p class="mt-2 text-sm text-gray-600">Paste this before the closing body tag on the client website. It adds a small floating button that opens the assistant.</p>
+                <pre class="mt-4 overflow-x-auto rounded-md bg-gray-950 p-4 text-sm text-white"><code>&lt;script async src="{{ route('widget.script') }}" data-business="{{ $business->slug }}"&gt;&lt;/script&gt;</code></pre>
             </section>
 
             <section class="rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-emerald-950">

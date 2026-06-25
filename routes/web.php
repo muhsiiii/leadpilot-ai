@@ -17,7 +17,7 @@ Route::get('/pricing', fn () => view('public.pricing', ['plans' => config('plans
 Route::get('/setup-guide', fn () => view('public.docs'))->name('public.docs');
 
 Route::get('/b/{business:slug}/chat', [ChatController::class, 'show'])->name('business.chat');
-Route::post('/b/{business:slug}/chat/send', [ChatController::class, 'sendForBusiness'])->name('business.chat.send');
+Route::post('/b/{business:slug}/chat/send', [ChatController::class, 'sendForBusiness'])->middleware('throttle:chat')->name('business.chat.send');
 Route::get('/widget.js', WidgetController::class)->name('widget.script');
 
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');

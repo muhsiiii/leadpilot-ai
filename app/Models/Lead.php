@@ -8,6 +8,7 @@ class Lead extends Model
 {
     protected $fillable = [
         'business_id',
+        'visitor_token',
         'name',
         'phone',
         'email',
