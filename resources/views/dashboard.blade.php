@@ -8,21 +8,14 @@
                 <p class="mt-1 text-sm text-gray-600">Track the leads your AI assistant captures.</p>
             </div>
 
-            @if ($business)
-                <a href="{{ route('business.chat', $business) }}" target="_blank" class="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
-                    Open Client Chat
-                </a>
-            @endif
+            <a href="{{ route('business.chat', $business) }}" target="_blank" class="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+                Open Client Chat
+            </a>
         </div>
     </x-slot>
 
     <div class="py-8">
         <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
-            @if (! $business)
-                <div class="rounded-lg border border-amber-200 bg-amber-50 p-6 text-amber-900">
-                    Add a business profile first. Once a business exists, captured leads will appear here.
-                </div>
-            @else
                 <section class="grid gap-4 md:grid-cols-4">
                     <div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
                         <p class="text-sm font-medium text-gray-500">Total Leads</p>
@@ -47,6 +40,7 @@
                         <div>
                             <h3 class="text-lg font-semibold text-gray-950">{{ $business->name }}</h3>
                             <p class="mt-1 text-sm text-gray-600">{{ $business->description }}</p>
+                            <p class="mt-2 text-xs font-semibold uppercase text-gray-500">{{ $business->plan }} plan · {{ number_format($business->monthly_conversation_limit) }} conversations/month</p>
                         </div>
                         <div class="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-700">
                             Embed URL: <span class="font-mono">{{ route('business.chat', $business) }}</span>
@@ -84,7 +78,15 @@
                                         <td class="max-w-md px-5 py-4 align-top text-gray-700">{{ $lead->requirement }}</td>
                                         <td class="px-5 py-4 align-top text-gray-700">{{ $lead->preferred_date ?? '-' }}</td>
                                         <td class="px-5 py-4 align-top">
-                                            <span class="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold uppercase text-emerald-700">{{ $lead->status }}</span>
+                                            <form method="POST" action="{{ route('businesses.leads.status', [$business, $lead]) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <select name="status" onchange="this.form.submit()" class="rounded-md border-gray-300 text-xs font-semibold uppercase focus:border-emerald-600 focus:ring-emerald-600">
+                                                    @foreach (['new', 'contacted', 'qualified', 'won', 'lost'] as $status)
+                                                        <option value="{{ $status }}" @selected($lead->status === $status)>{{ $status }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </form>
                                         </td>
                                         <td class="px-5 py-4 align-top text-gray-500">{{ $lead->created_at->diffForHumans() }}</td>
                                     </tr>
@@ -99,7 +101,6 @@
                         </table>
                     </div>
                 </section>
-            @endif
         </div>
     </div>
 </x-app-layout>

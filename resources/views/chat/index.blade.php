@@ -29,7 +29,7 @@
             <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
                 <p class="text-sm font-semibold text-slate-500">Popular Services</p>
                 <div class="mt-3 space-y-3">
-                    @foreach ($business->services as $service)
+                    @foreach ($business->activeServices as $service)
                         <div class="flex items-start justify-between gap-4 border-t border-slate-100 pt-3 first:border-t-0 first:pt-0">
                             <div>
                                 <p class="font-semibold">{{ $service->name }}</p>

@@ -44,7 +44,7 @@ class ChatController extends Controller
     private function renderChat(Business $business): View
     {
         return view('chat.index', [
-            'business' => $business,
+            'business' => $business->loadMissing(['activeServices', 'faqs']),
             'sendRoute' => route('business.chat.send', $business),
         ]);
     }
@@ -90,7 +90,7 @@ class ChatController extends Controller
 
     private function buildSystemPrompt(Business $business): string
     {
-        $services = $business->services
+        $services = $business->activeServices
             ->map(fn($service) => "- {$service->name}: {$service->description}, starting from INR {$service->price_from}")
             ->implode("\n");
 
@@ -105,6 +105,7 @@ class ChatController extends Controller
         Address: {$business->address}
         Opening hours: {$business->opening_hours}
         Description: {$business->description}
+        Extra owner instructions: {$business->ai_instructions}
 
         Services:
         {$services}

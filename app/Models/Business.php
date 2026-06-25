@@ -8,13 +8,24 @@ class Business extends Model
 {
     protected $fillable = [
         'name',
+        'user_id',
         'slug',
         'type',
         'phone',
         'email',
+        'website',
         'address',
         'opening_hours',
         'description',
+        'plan',
+        'subscription_status',
+        'monthly_conversation_limit',
+        'lead_email_notifications',
+        'ai_instructions',
+    ];
+
+    protected $casts = [
+        'lead_email_notifications' => 'boolean',
     ];
 
     public function getRouteKeyName(): string
@@ -25,6 +36,16 @@ class Business extends Model
     public function services()
     {
         return $this->hasMany(BusinessService::class);
+    }
+
+    public function activeServices()
+    {
+        return $this->hasMany(BusinessService::class)->where('is_active', true);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function faqs()

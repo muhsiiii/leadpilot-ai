@@ -46,4 +46,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function businesses()
+    {
+        return $this->hasMany(Business::class);
+    }
+
+    public function currentBusiness(): ?Business
+    {
+        return $this->businesses()->oldest()->first();
+    }
 }

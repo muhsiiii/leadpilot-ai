@@ -1,3 +1,5 @@
+@php($currentBusiness = Auth::user()?->currentBusiness())
+
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,9 +17,23 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('prospects.index')" :active="request()->routeIs('prospects.*')">
-                        {{ __('Prospects') }}
-                    </x-nav-link>
+                    @if ($currentBusiness)
+                        <x-nav-link :href="route('businesses.edit', $currentBusiness)" :active="request()->routeIs('businesses.edit')">
+                            {{ __('Business') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('businesses.services.index', $currentBusiness)" :active="request()->routeIs('businesses.services.*')">
+                            {{ __('Services') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('businesses.faqs.index', $currentBusiness)" :active="request()->routeIs('businesses.faqs.*')">
+                            {{ __('FAQs') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('businesses.install', $currentBusiness)" :active="request()->routeIs('businesses.install')">
+                            {{ __('Install') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('businesses.billing', $currentBusiness)" :active="request()->routeIs('businesses.billing')">
+                            {{ __('Billing') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -73,9 +89,23 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('prospects.index')" :active="request()->routeIs('prospects.*')">
-                {{ __('Prospects') }}
-            </x-responsive-nav-link>
+            @if ($currentBusiness)
+                <x-responsive-nav-link :href="route('businesses.edit', $currentBusiness)" :active="request()->routeIs('businesses.edit')">
+                    {{ __('Business') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('businesses.services.index', $currentBusiness)" :active="request()->routeIs('businesses.services.*')">
+                    {{ __('Services') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('businesses.faqs.index', $currentBusiness)" :active="request()->routeIs('businesses.faqs.*')">
+                    {{ __('FAQs') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('businesses.install', $currentBusiness)" :active="request()->routeIs('businesses.install')">
+                    {{ __('Install') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('businesses.billing', $currentBusiness)" :active="request()->routeIs('businesses.billing')">
+                    {{ __('Billing') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
