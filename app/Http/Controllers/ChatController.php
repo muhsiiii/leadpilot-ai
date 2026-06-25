@@ -13,25 +13,11 @@ use Illuminate\View\View;
 
 class ChatController extends Controller
 {
-    public function index(): View
-    {
-        $business = Business::with(['services', 'faqs'])->firstOrFail();
-
-        return $this->renderChat($business);
-    }
-
     public function show(Business $business): View
     {
         $business->load(['services', 'faqs']);
 
         return $this->renderChat($business);
-    }
-
-    public function send(Request $request, OpenRouterService $openRouter): JsonResponse
-    {
-        $business = Business::with(['services', 'faqs'])->firstOrFail();
-
-        return $this->handleSend($request, $openRouter, $business);
     }
 
     public function sendForBusiness(Request $request, OpenRouterService $openRouter, Business $business): JsonResponse
@@ -91,11 +77,11 @@ class ChatController extends Controller
     private function buildSystemPrompt(Business $business): string
     {
         $services = $business->activeServices
-            ->map(fn($service) => "- {$service->name}: {$service->description}, starting from INR {$service->price_from}")
+            ->map(fn ($service) => "- {$service->name}: {$service->description}, starting from INR {$service->price_from}")
             ->implode("\n");
 
         $faqs = $business->faqs
-            ->map(fn($faq) => "Q: {$faq->question}\nA: {$faq->answer}")
+            ->map(fn ($faq) => "Q: {$faq->question}\nA: {$faq->answer}")
             ->implode("\n\n");
 
         return "

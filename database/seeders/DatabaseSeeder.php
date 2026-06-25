@@ -8,9 +8,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([
-            DemoBusinessSeeder::class,
-            ProspectSeeder::class,
-        ]);
+        if ($this->command->getLaravel()->environment('local')) {
+            $this->call(DevUserSeeder::class);
+        }
     }
 }

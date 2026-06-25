@@ -61,7 +61,7 @@
                     id="messageInput"
                     type="text"
                     class="min-w-0 flex-1 rounded-lg border-slate-300 px-4 py-3 text-sm focus:border-emerald-600 focus:ring-emerald-600"
-                    placeholder="Example: I need dental cleaning tomorrow. My name is Vijay, phone 9876543210"
+                    placeholder="Ask about services, pricing, timing, or a callback"
                     autocomplete="off"
                     required
                 >

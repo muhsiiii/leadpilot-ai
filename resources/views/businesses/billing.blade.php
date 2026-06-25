@@ -17,13 +17,19 @@
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-950">{{ $plan['name'] }}</h3>
-                                <p class="mt-1 text-2xl font-bold text-gray-950">{{ $plan['price'] }}</p>
+                                <p class="mt-1 text-2xl font-bold text-gray-950">{{ $plan['price'] }}<span class="text-sm font-medium text-gray-500">/{{ $plan['period'] }}</span></p>
                             </div>
                             @if ($business->plan === $key)
                                 <span class="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold uppercase text-emerald-700">Current</span>
                             @endif
                         </div>
-                        <p class="mt-4 text-sm text-gray-600">{{ number_format($plan['limit']) }} AI conversations per month.</p>
+                        <p class="mt-4 text-sm text-gray-600">{{ $plan['summary'] }}</p>
+                        <p class="mt-2 text-sm font-semibold text-gray-800">{{ number_format($plan['conversation_limit']) }} AI conversations per month.</p>
+                        <ul class="mt-4 space-y-2 text-sm text-gray-600">
+                            @foreach ($plan['features'] as $feature)
+                                <li class="flex gap-2"><span class="font-semibold text-emerald-700">Included</span><span>{{ $feature }}</span></li>
+                            @endforeach
+                        </ul>
                         <button class="mt-5 w-full rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Choose {{ $plan['name'] }}</button>
                     </form>
                 @endforeach

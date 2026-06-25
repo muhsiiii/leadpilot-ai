@@ -33,7 +33,7 @@
                 <h3 class="font-semibold">Best first outreach angle</h3>
                 <p class="mt-2 text-sm">
                     Start with businesses that have clear enquiry value but weak automation. Offer a low-risk pilot:
-                    "I built a small AI appointment assistant for clinics/salons. It answers common questions and captures name + phone for callback. Can I show you a 2-minute demo with your services?"
+                    "I built an AI enquiry assistant for service businesses. It answers common questions and captures name plus phone for callback. Can I show you a short walkthrough using your services?"
                 </p>
             </section>
 

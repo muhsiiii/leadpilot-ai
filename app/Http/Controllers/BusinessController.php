@@ -58,11 +58,7 @@ class BusinessController extends Controller
 
         return view('businesses.billing', [
             'business' => $business,
-            'plans' => [
-                'starter' => ['name' => 'Starter', 'price' => '$9/mo', 'limit' => 100],
-                'growth' => ['name' => 'Growth', 'price' => '$29/mo', 'limit' => 500],
-                'pro' => ['name' => 'Pro', 'price' => '$59/mo', 'limit' => 2000],
-            ],
+            'plans' => config('plans'),
         ]);
     }
 
@@ -74,16 +70,12 @@ class BusinessController extends Controller
             'plan' => ['required', Rule::in(['starter', 'growth', 'pro'])],
         ]);
 
-        $limits = [
-            'starter' => 100,
-            'growth' => 500,
-            'pro' => 2000,
-        ];
+        $plan = config("plans.{$validated['plan']}");
 
         $business->update([
             'plan' => $validated['plan'],
             'subscription_status' => 'trial',
-            'monthly_conversation_limit' => $limits[$validated['plan']],
+            'monthly_conversation_limit' => $plan['conversation_limit'],
         ]);
 
         return back()->with('status', 'plan-updated');
@@ -121,7 +113,7 @@ class BusinessController extends Controller
 
         while (Business::query()
             ->where('slug', $slug)
-            ->when($business, fn($query) => $query->whereKeyNot($business->id))
+            ->when($business, fn ($query) => $query->whereKeyNot($business->id))
             ->exists()) {
             $slug = "{$base}-{$counter}";
             $counter++;

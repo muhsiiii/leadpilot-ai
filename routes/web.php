@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\ChatController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\BusinessServiceController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LeadController;
@@ -11,12 +11,11 @@ use App\Http\Controllers\ProspectController;
 use App\Http\Controllers\WidgetController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn () => view('public.home', ['plans' => config('plans')]))->name('home');
+Route::get('/how-it-works', fn () => view('public.how-it-works'))->name('public.how-it-works');
+Route::get('/pricing', fn () => view('public.pricing', ['plans' => config('plans')]))->name('public.pricing');
+Route::get('/setup-guide', fn () => view('public.docs'))->name('public.docs');
 
-Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
 Route::get('/b/{business:slug}/chat', [ChatController::class, 'show'])->name('business.chat');
 Route::post('/b/{business:slug}/chat/send', [ChatController::class, 'sendForBusiness'])->name('business.chat.send');
 Route::get('/widget.js', WidgetController::class)->name('widget.script');
@@ -53,5 +52,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

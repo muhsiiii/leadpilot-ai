@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "leadpilot/leadpilot-ai",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "AI lead capture SaaS for business websites and hosted enquiry assistants.",
+    "keywords": ["lead-capture", "saas", "ai", "laravel"],
     "license": "MIT",
     "require": {
         "php": "^8.2",

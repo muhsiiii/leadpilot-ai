@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="mb-5">
+        <h1 class="text-xl font-bold text-slate-950">Login to LeadPilot</h1>
+        <p class="mt-2 text-sm text-slate-600">Manage your assistant, captured leads, services, FAQs, and install settings.</p>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -32,16 +37,21 @@
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             @if (Route::has('password.request'))
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
                 </a>
             @endif
 
-            <x-primary-button class="ms-3">
+            <x-primary-button>
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
     </form>
+
+    <p class="mt-5 border-t border-slate-200 pt-4 text-sm text-slate-600">
+        New to LeadPilot?
+        <a href="{{ route('register') }}" class="font-semibold text-emerald-700 hover:text-emerald-900">Create a business account</a>
+    </p>
 </x-guest-layout>
